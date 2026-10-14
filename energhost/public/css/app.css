@@ -1,0 +1,145 @@
+/* Energhost - páginas de la aplicación (cuenta, panel, administración).
+   Usa la misma paleta y tipografías que la presentación (landing.css). */
+
+:root {
+  --navy-deep: #0A2E6B;
+  --blue-brand: #0057D6;
+  --green-energy: #0FB88A;
+  --amber-alert: #FFC72C;
+  --red: #D63B2F;
+  --bg-light: #F4F7FB;
+  --bg-white: #FFFFFF;
+  --ink: #0B1220;
+  --ink-soft: #42506B;
+  --line: #DDE4EF;
+  --mono: 'IBM Plex Mono', monospace;
+  --display: 'Space Grotesk', sans-serif;
+  --body: 'IBM Plex Sans', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--body); color: var(--ink); background: var(--bg-light); line-height: 1.55; min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
+a { color: var(--blue-brand); }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; color: var(--navy-deep); letter-spacing: -0.01em; }
+h1 { font-size: 28px; }
+.oculto { display: none !important; }
+.texto-suave { color: var(--ink-soft); font-size: 14px; }
+.mono { font-family: var(--mono); }
+
+/* ---------- Encabezado ---------- */
+.barra { position: sticky; top: 0; z-index: 10; background: rgba(244,247,251,.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.barra-interior { max-width: 1180px; margin: 0 auto; padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 17px; color: var(--navy-deep); text-decoration: none; }
+.brand .mark { width: 32px; height: 32px; border-radius: 7px; background: linear-gradient(135deg, var(--navy-deep), var(--blue-brand)); position: relative; flex-shrink: 0; }
+.brand .mark::after { content: ""; position: absolute; inset: 9px; border: 2px solid var(--amber-alert); border-right-color: transparent; border-bottom-color: transparent; border-radius: 2px; transform: rotate(45deg); }
+.brand small { display: block; font-family: var(--mono); font-weight: 400; font-size: 10px; letter-spacing: .08em; color: var(--ink-soft); text-transform: uppercase; }
+.menu { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; font-size: 14.5px; font-weight: 500; }
+.menu a { color: var(--ink-soft); text-decoration: none; }
+.menu a:hover { color: var(--blue-brand); }
+.menu .usuario-nombre { color: var(--navy-deep); font-weight: 600; }
+.menu form { margin: 0; }
+
+/* ---------- Botones ---------- */
+.btn { font-family: var(--body); font-weight: 600; font-size: 15px; padding: 11px 20px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid transparent; cursor: pointer; text-decoration: none; transition: .18s ease; }
+.btn-primary { background: var(--navy-deep); color: #fff; }
+.btn-primary:hover { background: var(--blue-brand); }
+.btn-ghost { border-color: var(--line); color: var(--navy-deep); background: #fff; }
+.btn-ghost:hover { border-color: var(--blue-brand); color: var(--blue-brand); }
+.btn-peligro { border-color: #F2C6C1; color: var(--red); background: #fff; }
+.btn-peligro:hover { background: #FBE6E3; }
+.btn-chico { padding: 7px 12px; font-size: 13.5px; }
+.btn-link { background: none; border: 0; color: var(--ink-soft); font: inherit; cursor: pointer; padding: 0; }
+.btn-link:hover { color: var(--blue-brand); }
+
+/* ---------- Contenido ---------- */
+.contenedor { flex: 1; width: 100%; max-width: 1180px; margin: 0 auto; padding: 28px 20px 48px; }
+.encabezado { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 14px; margin-bottom: 22px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--blue-brand); display: inline-flex; align-items: center; gap: 8px; font-weight: 500; margin-bottom: 6px; }
+.eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green-energy); box-shadow: 0 0 0 3px rgba(15,184,138,.18); }
+
+.tarjeta { background: var(--bg-white); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+.tarjeta h2 { font-size: 13px; font-family: var(--mono); font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); margin-bottom: 10px; }
+.grilla { display: grid; gap: 14px; grid-template-columns: 1fr; margin-bottom: 16px; }
+.grilla .tarjeta { margin-bottom: 0; }
+.grilla-4 { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 760px) {
+  .grilla-2 { grid-template-columns: repeat(2, 1fr); }
+  .grilla-3 { grid-template-columns: repeat(3, 1fr); }
+  .grilla-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+.valor { font-family: var(--mono); font-size: 30px; font-weight: 600; color: var(--navy-deep); }
+.valor-chico { font-size: 22px; }
+.unidad { font-family: var(--mono); font-size: 13px; color: var(--ink-soft); }
+.desactualizado .valor { color: #9AA6BC; }
+.tarjeta-alerta { border-color: var(--red); box-shadow: inset 0 0 0 1px var(--red); }
+.tarjeta-alerta .valor { color: var(--red); }
+
+/* ---------- Estado de conexión ---------- */
+.estado { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; font-family: var(--mono); font-size: 12px; font-weight: 600; border: 1px solid var(--line); background: #fff; color: var(--ink-soft); }
+.estado .punto { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.estado-verde { color: #0A8A67; border-color: #B6E8D8; background: #EEFBF6; }
+.estado-rojo { color: var(--red); border-color: #F2C6C1; background: #FDF1EF; }
+
+/* ---------- Avisos ---------- */
+.aviso { padding: 12px 16px; border-radius: 10px; margin-bottom: 14px; border: 1px solid; font-size: 14.5px; }
+.aviso-ok { background: #EEFBF6; border-color: #B6E8D8; color: #075E47; }
+.aviso-error, .aviso-rojo { background: #FDF1EF; border-color: #F2C6C1; color: #8E2A20; }
+.aviso-amarillo { background: #FFF8E1; border-color: #FFE29A; color: #6B5100; }
+.aviso-gris { background: #fff; border-color: var(--line); color: var(--ink-soft); }
+
+/* ---------- Formularios ---------- */
+.caja-form { max-width: 420px; margin: 24px auto; }
+.formulario { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+.formulario label { font-size: 13.5px; font-weight: 600; color: var(--navy-deep); margin-top: 8px; }
+.formulario input { padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; background: #fff; }
+.formulario input:focus { outline: 2px solid rgba(0,87,214,.25); border-color: var(--blue-brand); }
+.formulario .ayuda { font-size: 12.5px; color: var(--ink-soft); }
+.formulario .btn { margin-top: 14px; justify-content: center; }
+.form-linea { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.form-linea input { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+
+/* ---------- Lista de dispositivos ---------- */
+.equipo { display: block; text-decoration: none; color: inherit; transition: .18s ease; }
+.equipo:hover { border-color: var(--blue-brand); transform: translateY(-1px); }
+.equipo-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 14px; }
+.equipo-nombre { font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--navy-deep); }
+.equipo-id { font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); }
+.vacio { text-align: center; padding: 40px 20px; }
+.vacio p { margin: 8px 0 18px; }
+
+/* ---------- Relés ---------- */
+.reles { display: grid; gap: 10px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .reles-3 { grid-template-columns: repeat(3, 1fr); } }
+.rele { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+.rele-nombre { display: block; font-weight: 600; color: var(--navy-deep); }
+.rele-toma { display: block; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.equipo-tomas { display: block; font-size: 13px; margin-top: 4px; }
+.tomas-form { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 6px 0 4px; display: grid; gap: 6px; }
+.tomas-form legend { font-weight: 600; color: var(--navy-deep); padding: 0 6px; }
+.rele-estado { margin-left: auto; font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft); }
+.rele-estado.encendido { color: #0A8A67; }
+.interruptor { appearance: none; width: 48px; height: 28px; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+.interruptor::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: transform .2s; }
+.interruptor:checked { background: var(--green-energy); }
+.interruptor:checked::after { transform: translateX(20px); }
+.interruptor:disabled { opacity: .5; cursor: not-allowed; }
+.interruptor:focus-visible { outline: 2px solid var(--blue-brand); outline-offset: 2px; }
+
+/* ---------- Gráfico ---------- */
+.grafico svg { width: 100%; height: auto; display: block; }
+.grafico .linea { fill: none; stroke: var(--green-energy); stroke-width: 2.5; stroke-linejoin: round; }
+.grafico .guia { stroke: var(--line); stroke-width: 1; }
+.grafico .eje { fill: var(--ink-soft); font-family: var(--mono); font-size: 11px; }
+
+/* ---------- Tablas (actividad y usuarios) ---------- */
+.tabla-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; font-family: var(--mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); font-weight: 500; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+td { padding: 10px; border-bottom: 1px dashed var(--line); vertical-align: middle; }
+tr:last-child td { border-bottom: 0; }
+.etiqueta { display: inline-block; font-family: var(--mono); font-size: 11px; padding: 3px 8px; border-radius: 6px; background: rgba(0,87,214,.08); color: var(--blue-brand); font-weight: 600; }
+.etiqueta-admin { background: rgba(255,199,44,.2); color: #6B5100; }
+
+/* ---------- Pie ---------- */
+.pie { padding: 22px 20px; text-align: center; font-size: 12.5px; color: var(--ink-soft); border-top: 1px solid var(--line); }

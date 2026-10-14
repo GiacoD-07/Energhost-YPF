@@ -1,0 +1,19 @@
+{
+    "name": "voltec/energhost",
+    "description": "Energhost - Sistema IoT de monitoreo y control de energía (EcoSmart Grid)",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "slim/slim": "^4.15",
+        "slim/psr7": "^1.8",
+        "slim/php-view": "^3.4",
+        "vlucas/phpdotenv": "^5.6"
+    },
+    "scripts": {
+        "serve": "php -S localhost:8000 -t public public/router.php",
+        "simulador": "php scripts/simulador.php"
+    }
+}

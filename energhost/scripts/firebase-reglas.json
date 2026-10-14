@@ -1,0 +1,42 @@
+{
+  "rules": {
+    "usuarios": {
+      ".read": false,
+      ".write": false
+    },
+    "usuarios_por_email": {
+      ".read": false,
+      ".write": false
+    },
+    "eventos": {
+      ".read": false,
+      ".write": false
+    },
+    "dispositivos": {
+      "$dispositivo": {
+        ".read": "auth != null",
+        "info": {
+          ".write": "auth != null",
+          "duenio": { ".validate": "newData.val() === data.val()" },
+          "nombre": { ".validate": "newData.val() === data.val()" }
+        },
+        "vinculacion": {
+          "codigo": {
+            ".write": "auth != null",
+            ".validate": "!data.exists() || newData.val() === data.val()"
+          }
+        },
+        "lectura_actual": { ".write": "auth != null" },
+        "estado": { ".write": "auth != null" },
+        "reles": { ".write": "auth != null" }
+      }
+    },
+    "historial": {
+      "$dispositivo": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".indexOn": ["timestamp"]
+      }
+    }
+  }
+}
