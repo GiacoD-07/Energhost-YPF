@@ -172,6 +172,8 @@ Completar el `.env` con `FIREBASE_URL`, `FIREBASE_AUTH` (el secreto) y el precio
 composer serve
 ```
 
+Para comprobar que el servidor anda, abrir http://localhost:8000/estado: tiene que aparecer **✅ 200 OK** (como pide el TP 6).
+
 > **Importante:** el servidor se arranca con `-t public public/router.php` (eso hace `composer serve`). Si se ejecuta solo `php -S localhost:8000` desde la raíz, todas las páginas dan **404 Not Found**.
 
 Abrir http://localhost:8000, crear una cuenta y convertirla en administrador:

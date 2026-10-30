@@ -13,6 +13,11 @@ return function ($app, $renderer) {
     });
 
     // Cuenta: registro, ingreso y salida
+    // Comprobación del servidor (TP 6): muestra "200 OK"
+    $app->get("/estado", function ($request, $response) use ($renderer) {
+        return home_estado_controller($renderer, $response);
+    });
+
     $app->get("/registro", function ($request, $response) use ($renderer) {
         return auth_mostrar_registro_controller($renderer, $response);
     });
