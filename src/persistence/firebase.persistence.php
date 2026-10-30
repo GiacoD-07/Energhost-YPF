@@ -104,7 +104,7 @@ function firebase_peticion_persistence(string $metodo, string $ruta, $datos = nu
     $cuerpo = curl_exec($ch);
     $codigo = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $errorCurl = curl_error($ch);
-    curl_close($ch);
+   
 
     if ($cuerpo === false || $codigo < 200 || $codigo >= 300) {
         $detalle = $errorCurl !== "" ? $errorCurl : "HTTP " . $codigo;
