@@ -91,35 +91,84 @@ function panel_detalle_controller($renderer, $response, string $dispositivoId)
 }
 
 /**
+ * Lee el lugar elegido con los botones (Cocina, Living...). Si eligió "Otro", usa lo que escribió.
+ * También acepta el campo "nombre", que es el que usa la API.
+ */
+function leer_lugar_controller(array $datos): string
+{
+    $lugar = trim((string) ($datos["lugar"] ?? ""));
+    if ($lugar === "otro") {
+        return trim((string) ($datos["lugar_otro"] ?? ""));
+    }
+
+    return $lugar !== "" ? $lugar : trim((string) ($datos["nombre"] ?? ""));
+}
+
+/**
+ * Datos que necesitan las dos pantallas de vinculación.
+ */
+function datos_vista_vincular_controller(array $usuario, array $extra): array
+{
+    return array_merge([
+        "titulo" => "Agregar equipo — Energhost",
+        "usuario" => $usuario,
+        "equipo" => "",
+        "codigo" => "",
+        "lugar" => "",
+        "lugarOtro" => "",
+        "lugares" => LUGARES_SUGERIDOS,
+        "nombresTomas" => leer_nombres_tomas_controller([]),
+        "error" => null,
+    ], $extra);
+}
+
+/**
  * GET /vincular  (acepta ?equipo=A1B2C3&codigo=123456, que vienen del QR de la etiqueta)
+ * Si el QR trae datos correctos, muestra directamente "Encontramos tu equipo" y solo falta
+ * elegir el lugar. Si no, muestra el formulario para escribir los datos a mano.
  */
 function vincular_formulario_controller($renderer, $request, $response)
 {
     $usuario = usuario_actual_service();
     $parametros = $request->getQueryParams();
-    $equipo = substr(preg_replace("/[^A-Za-z0-9_]/", "", (string) ($parametros["equipo"] ?? "")), 0, 30);
+    $equipo = substr(preg_replace("/[^A-Za-z0-9_:\-]/", "", (string) ($parametros["equipo"] ?? "")), 0, 30);
     $codigo = substr(preg_replace("/[^0-9]/", "", (string) ($parametros["codigo"] ?? "")), 0, 6);
 
     if ($usuario === null) {
         // Si escanearon el QR sin cuenta, primero se registran o ingresan y después vuelven acá
-        $volver = "/vincular?equipo={$equipo}&codigo={$codigo}";
-        guardar_aviso_util("Ingresá o creá tu cuenta para vincular el equipo.");
+        $volver = "/vincular?equipo=" . rawurlencode($equipo) . "&codigo={$codigo}";
+        guardar_aviso_util("Para vincular tu equipo, ingresá o creá tu cuenta. Es un minuto.");
         return redirigir_util($response, "/login?volver=" . rawurlencode($volver));
     }
 
-    return view($renderer, $response, "dispositivos/vincular.php", [
-        "titulo" => "Vincular equipo — Energhost",
-        "usuario" => $usuario,
+    if ($equipo !== "" && $codigo !== "") {
+        try {
+            $dispositivoId = revisar_vinculacion_service($usuario, $equipo, $codigo);
+            return view($renderer, $response, "dispositivos/vincular-confirmar.php", datos_vista_vincular_controller($usuario, [
+                "equipo" => $equipo,
+                "codigo" => $codigo,
+                "dispositivoId" => $dispositivoId,
+            ]));
+        } catch (InvalidArgumentException $e) {
+            return view($renderer, $response, "dispositivos/vincular.php", datos_vista_vincular_controller($usuario, [
+                "equipo" => $equipo,
+                "error" => $e->getMessage(),
+            ]));
+        } catch (RuntimeException $e) {
+            return view($renderer, $response, "dispositivos/vincular.php", datos_vista_vincular_controller($usuario, [
+                "equipo" => $equipo,
+                "error" => "No pudimos conectarnos con el servidor. Probá de nuevo en unos segundos.",
+            ]));
+        }
+    }
+
+    return view($renderer, $response, "dispositivos/vincular.php", datos_vista_vincular_controller($usuario, [
         "equipo" => $equipo,
-        "codigo" => $codigo,
-        "nombre" => "",
-        "nombresTomas" => leer_nombres_tomas_controller([]),
-        "error" => null,
-    ]);
+    ]));
 }
 
 /**
- * POST /vincular
+ * POST /vincular - Lo envían las dos pantallas (la del QR y la manual).
  */
 function vincular_dispositivo_controller($renderer, $request, $response)
 {
@@ -131,12 +180,13 @@ function vincular_dispositivo_controller($renderer, $request, $response)
     $datos = $request->getParsedBody() ?? [];
     $equipo = (string) ($datos["equipo"] ?? "");
     $codigo = (string) ($datos["codigo"] ?? "");
-    $nombre = (string) ($datos["nombre"] ?? "");
+    $lugar = leer_lugar_controller($datos);
     $nombresTomas = leer_nombres_tomas_controller($datos);
+    $desdeQr = ($datos["paso"] ?? "") === "confirmar";
 
     try {
-        $dispositivoId = vincular_dispositivo_service($usuario, $equipo, $codigo, $nombre, $nombresTomas);
-        guardar_aviso_util("¡Listo! \"" . trim($nombre) . "\" ya está en tu cuenta.");
+        $dispositivoId = vincular_dispositivo_service($usuario, $equipo, $codigo, $lugar, $nombresTomas);
+        guardar_aviso_util("¡Listo! Tu equipo de \"{$lugar}\" ya está en tu cuenta. Tocá cada toma para prenderla o apagarla.");
         return redirigir_util($response, "/panel/" . rawurlencode($dispositivoId));
     } catch (InvalidArgumentException $e) {
         $error = $e->getMessage();
@@ -144,15 +194,22 @@ function vincular_dispositivo_controller($renderer, $request, $response)
         $error = "No pudimos conectarnos con el servidor. Probá de nuevo en unos segundos.";
     }
 
-    return view($renderer, $response->withStatus(422), "dispositivos/vincular.php", [
-        "titulo" => "Vincular equipo — Energhost",
-        "usuario" => $usuario,
+    $vista = [
         "equipo" => $equipo,
-        "codigo" => "",
-        "nombre" => $nombre,
+        "lugar" => trim((string) ($datos["lugar"] ?? "")),
+        "lugarOtro" => trim((string) ($datos["lugar_otro"] ?? "")),
         "nombresTomas" => $nombresTomas,
         "error" => $error,
-    ]);
+    ];
+
+    // Si venía del QR y el problema es solo el lugar, se queda en la pantalla simple
+    if ($desdeQr && $lugar === "") {
+        $vista["codigo"] = $codigo;
+        $vista["dispositivoId"] = (string) ($datos["dispositivo"] ?? "");
+        return view($renderer, $response->withStatus(422), "dispositivos/vincular-confirmar.php", datos_vista_vincular_controller($usuario, $vista));
+    }
+
+    return view($renderer, $response->withStatus(422), "dispositivos/vincular.php", datos_vista_vincular_controller($usuario, $vista));
 }
 
 /**
@@ -233,5 +290,40 @@ function api_eventos_controller($response, string $dispositivoId)
         return json_response_util($response, ["ok" => false, "error" => $e->getMessage()], 404);
     } catch (RuntimeException $e) {
         return json_response_util($response, ["ok" => false, "error" => "No se pudo obtener la actividad"], 503);
+    }
+}
+
+/**
+ * POST /api/dispositivos/{id}/vincular - Vincula el equipo a la cuenta del usuario que inició sesión.
+ * {id} puede ser el identificador (A1B2C3, EcoSmart_A1B2C3) o la MAC completa (24:6F:28:A1:B2:C3).
+ * Cuerpo: {"codigo": "483920", "nombre": "Cocina", "tomas": {"1": "Heladera", "2": "Microondas"}}
+ * Respuestas: 201 vinculado · 400 JSON inválido · 401 sin sesión · 422 datos incorrectos · 429 bloqueado · 503 sin Firebase
+ */
+function api_vincular_dispositivo_controller($request, $response, string $textoId)
+{
+    $usuario = usuario_actual_service();
+    if ($usuario === null) {
+        return json_response_util($response, ["ok" => false, "error" => "Iniciá sesión para continuar"], 401);
+    }
+
+    $datos = $request->getParsedBody();
+    if (!is_array($datos)) {
+        return json_response_util($response, ["ok" => false, "error" => "Formato JSON inválido en el cuerpo de la solicitud"], 400);
+    }
+
+    $tomas = is_array($datos["tomas"] ?? null) ? $datos["tomas"] : [];
+    $nombresTomas = [];
+    for ($numero = 1; $numero <= CANTIDAD_TOMAS; $numero++) {
+        $nombresTomas[$numero] = (string) ($tomas[(string) $numero] ?? $tomas[$numero] ?? "");
+    }
+
+    try {
+        $dispositivoId = vincular_dispositivo_service($usuario, rawurldecode($textoId), (string) ($datos["codigo"] ?? ""), (string) ($datos["nombre"] ?? ""), $nombresTomas);
+        return json_response_util($response, ["ok" => true, "dispositivo" => $dispositivoId], 201);
+    } catch (InvalidArgumentException $e) {
+        $codigoHttp = $e->getMessage() === MENSAJE_BLOQUEO ? 429 : 422;
+        return json_response_util($response, ["ok" => false, "error" => $e->getMessage()], $codigoHttp);
+    } catch (RuntimeException $e) {
+        return json_response_util($response, ["ok" => false, "error" => "No se pudo vincular el equipo"], 503);
     }
 }

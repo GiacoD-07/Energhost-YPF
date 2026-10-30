@@ -1,0 +1,28 @@
+# Variables de entorno y claves
+.env
+.env.local
+.env.*.local
+firmware/secrets.h
+
+# Dependencias (se instalan con composer install)
+/vendor/
+
+# PlatformIO
+.pio/
+
+# Logs y temporales
+*.log
+/tmp/
+/cache/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+
+# Datos del Firebase de prueba
+scripts/firebase-local.json

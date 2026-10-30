@@ -46,11 +46,16 @@ ESP32 + PZEM-004T ──internet──► Firebase Realtime Database ◄──in
 
 ### Vinculación de un equipo
 
+Pensada para que cualquier persona lo pueda hacer sola, sin saber de tecnología.
+
 1. La primera vez que arranca, el ESP32 arma su identificador con la MAC (`EcoSmart_A1B2C3`) y genera un código de 6 cifras que guarda en su memoria.
-2. Se presenta en Firebase **sin dueño** y muestra los datos en el monitor serie (y en la pantalla OLED cuando se agregue).
-3. El usuario entra a **Vincular equipo**, escribe el identificador (`A1B2C3`), el código, el nombre del equipo (ej: "Cocina") y, si quiere, qué artefacto hay en cada toma ("Heladera", "Microondas"…). Una toma sin nombre aparece como "Toma 1", "Toma 2"… También puede escanear el QR de la etiqueta, que completa los datos solo.
-4. El panel comprueba que el equipo exista, que no tenga dueño y que el código coincida. Si está todo bien, lo asigna a la cuenta.
-5. Después de 5 códigos incorrectos, la vinculación se bloquea 10 minutos.
+2. Se presenta en Firebase **sin dueño** y muestra los datos en el monitor serie (y en la pantalla OLED cuando se agregue). Esos datos y el QR van en la etiqueta del gabinete.
+3. **Con el QR (3 toques):** la persona escanea el QR con la cámara del celular → ve "¡Encontramos tu equipo!" → elige dónde está (Cocina, Living, Dormitorio, Lavadero, Oficina u Otro) → toca **Vincular mi equipo**. Si no tenía sesión, primero ingresa o crea la cuenta y vuelve sola a esa pantalla.
+4. **A mano:** en **Agregar equipo** escribe el identificador (`A1B2C3`) o la **MAC completa** (`24:6F:28:A1:B2:C3`), el código y el lugar. Lo que hay en cada toma es opcional: sin nombre aparecen como "Toma 1", "Toma 2"…
+5. El usuario que inició sesión queda como **dueño**. Antes, el panel comprueba que el equipo exista, que no tenga dueño y que el código coincida: la ID dice *qué* equipo es y el código prueba que la persona *lo tiene en la mano*.
+6. Después de 5 intentos fallidos, la vinculación se bloquea 10 minutos.
+
+La misma vinculación está disponible por API: `POST /api/dispositivos/{id}/vincular`, protegida por sesión (ver **API del panel**).
 
 ---
 
@@ -60,8 +65,10 @@ ESP32 + PZEM-004T ──internet──► Firebase Realtime Database ◄──in
 public/                     ← única carpeta accesible desde la web
     index.php               ← entrada única
     router.php              ← solo para el servidor de desarrollo de PHP
-    css/landing.css         ← diseño de la presentación
-    css/app.css             ← diseño del panel (misma paleta)
+    css/landing.css         ← diseño de la presentación (oscuro con acento azul)
+    css/app.css             ← diseño del panel (mismo estilo)
+    img/logo.svg            ← logo de Voltec Ergon (onda)
+    favicon.ico, icons/     ← íconos de la pestaña y de la app instalada
     js/landing.js           ← calculadora de la presentación
     js/panel.js             ← refresca "Mis dispositivos"
     js/dispositivo.js       ← panel de un equipo (cada 2 s)
@@ -73,9 +80,12 @@ src/
     services/               ← auth, dispositivos, mediciones, reles, usuarios
     persistence/            ← firebase (cURL), usuarios, dispositivos, mediciones, reles, eventos
     utils/                  ← electricidad, config y render
-    views/                  ← layouts (landing y main), partials, home, auth, dispositivos, admin
+    views/                  ← layouts (landing y main), partials (nav, footer, lugares), home, auth,
+                              dispositivos (lista, detalle, vincular, vincular-confirmar), admin
 scripts/
     simulador.php           ← ESP32 falso para trabajar sin hardware
+    firebase-local.php      ← Firebase de prueba en la PC (solo desarrollo)
+    probar_firebase.php     ← comprueba la conexión con Firebase
     crear_admin.php         ← convierte una cuenta en administrador
     firebase-reglas.json    ← reglas de seguridad de la base
     start-local.ps1         ← arranque rápido en Windows
@@ -156,17 +166,45 @@ composer install
 copy .env.example .env
 ```
 
-Completar el `.env` con `FIREBASE_URL`, `FIREBASE_AUTH` (el secreto) y el precio del kWh de una factura real. Después:
+Completar el `.env` con `FIREBASE_URL`, `FIREBASE_AUTH` (el secreto) y el precio del kWh de una factura real. Comprobar la conexión con `php scripts/probar_firebase.php` (escribe, lee y borra una rama de prueba). Después:
 
 ```powershell
 composer serve
 ```
+
+> **Importante:** el servidor se arranca con `-t public public/router.php` (eso hace `composer serve`). Si se ejecuta solo `php -S localhost:8000` desde la raíz, todas las páginas dan **404 Not Found**.
 
 Abrir http://localhost:8000, crear una cuenta y convertirla en administrador:
 
 ```powershell
 php scripts/crear_admin.php tu-email@ejemplo.com
 ```
+
+### Probar sin Firebase real (Firebase de prueba)
+
+Para probar todo en la PC antes de crear la base real, `scripts/firebase-local.php` imita la API de Firebase y guarda los datos en `scripts/firebase-local.json`. Es solo para desarrollo: la entrega usa el Firebase real.
+
+En el `.env`:
+
+```text
+FIREBASE_URL=http://127.0.0.1:9100
+FIREBASE_AUTH=local
+```
+
+Y tres terminales en VS Code (**Terminal → Nueva terminal**, o el botón **+**), las tres en la carpeta del proyecto:
+
+```powershell
+# Terminal 1: Firebase de prueba
+composer firebase-local
+
+# Terminal 2: panel
+composer serve
+
+# Terminal 3: un equipo simulado con sus 3 tomas
+php scripts/simulador.php
+```
+
+Abrir http://localhost:8000, crear una cuenta, ir a **Vincular equipo** y usar el identificador y el código que muestra la terminal 3 (o abrir el link del QR que imprime). Para empezar de cero, cortar todo y borrar `scripts/firebase-local.json`.
 
 ### 3. Simulador (sin hardware)
 
@@ -197,6 +235,7 @@ Todas las rutas exigen sesión y verifican que el equipo sea del usuario (o que 
 | Método y ruta | Devuelve |
 | --- | --- |
 | `GET /api/dispositivos` | Equipos del usuario con su estado resumido |
+| `POST /api/dispositivos/{id}/vincular` | Vincula el equipo al usuario que inició sesión. `{id}` = identificador o MAC. Cuerpo: `{"codigo": "483920", "nombre": "Cocina", "tomas": {"1": "Heladera"}}`. Responde 201, o 401 / 422 / 429 |
 | `GET /api/dispositivos/{id}/ultima` | Última lectura, `en_linea`, alertas, costo y CO2 |
 | `GET /api/dispositivos/{id}/historial?limite=120` | Lecturas por minuto y análisis de consumo vampiro |
 | `GET /api/dispositivos/{id}/reles` | Estado de los 3 relés |

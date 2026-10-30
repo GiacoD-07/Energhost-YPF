@@ -111,7 +111,7 @@
         <button type="submit" class="btn btn-ghost btn-chico">Guardar nombres</button>
     </form>
     <form method="post" action="<?= $base ?>/panel/<?= rawurlencode($dispositivoId) ?>/desvincular" style="margin-top:16px"
-          onsubmit="return confirm('¿Quitar este equipo de tu cuenta? Se puede volver a vincular con su código.');">
+          onsubmit="return confirm('¿Quitar este equipo de tu cuenta? Se puede volver a agregar con el código de la etiqueta.');">
         <button type="submit" class="btn btn-peligro btn-chico">Quitar equipo de mi cuenta</button>
     </form>
 </section>

@@ -3,7 +3,9 @@
         <span class="eyebrow">Hola, <?= htmlspecialchars($usuario["nombre"]) ?></span>
         <h1>Mis dispositivos</h1>
     </div>
-    <a href="<?= $base ?>/vincular" class="btn btn-primary">+ Vincular equipo</a>
+    <?php if (!empty($dispositivos)): ?>
+        <a href="<?= $base ?>/vincular" class="btn btn-primary">+ Agregar equipo</a>
+    <?php endif; ?>
 </section>
 
 <?php if (!empty($error)): ?>
@@ -13,10 +15,12 @@
 <?php if (empty($dispositivos) && empty($error)): ?>
     <section class="tarjeta vacio">
         <h2>Todavía no tenés equipos</h2>
-        <p class="texto-suave">
-            Enchufá tu Eco Smart Grid, conectalo al Wi-Fi y vinculalo con el código de su etiqueta.
-        </p>
-        <a href="<?= $base ?>/vincular" class="btn btn-primary">Vincular mi primer equipo</a>
+        <ol class="pasos-inicio">
+            <li><strong>Enchufá el equipo</strong> en la pared.</li>
+            <li><strong>Conectalo a tu Wi-Fi.</strong> La primera vez aparece la red "Energhost-Config": entrá desde el celular y elegí tu Wi-Fi.</li>
+            <li><strong>Escaneá el QR</strong> de la etiqueta con la cámara del celular.</li>
+        </ol>
+        <a href="<?= $base ?>/vincular" class="btn btn-primary">Agregar mi primer equipo</a>
     </section>
 <?php else: ?>
     <section class="grilla grilla-3" id="lista-equipos">

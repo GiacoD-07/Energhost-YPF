@@ -13,6 +13,12 @@ return function ($app) {
         return api_listar_dispositivos_controller($response);
     });
 
+    // Vincular un equipo a la cuenta del usuario que inició sesión.
+    // {id} = identificador (A1B2C3) o MAC completa. Cuerpo: {"codigo": "483920", "nombre": "Cocina"}
+    $app->post("/api/dispositivos/{id}/vincular", function ($request, $response, $args) {
+        return api_vincular_dispositivo_controller($request, $response, $args["id"]);
+    });
+
     // Última lectura, conexión y alertas de un equipo
     $app->get("/api/dispositivos/{id}/ultima", function ($request, $response, $args) {
         return api_obtener_ultima_medicion_controller($response, $args["id"]);

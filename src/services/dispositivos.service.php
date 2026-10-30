@@ -14,14 +14,28 @@ const MAX_INTENTOS_VINCULACION = 5;
 const MINUTOS_BLOQUEO_VINCULACION = 10;
 const CANTIDAD_TOMAS = 3;
 
+// Lugares que se ofrecen como botones al vincular (también se puede escribir otro).
+const LUGARES_SUGERIDOS = ["Cocina", "Living", "Dormitorio", "Lavadero", "Oficina"];
+
+// Mensajes en lenguaje simple: los lee cualquier persona, no un programador.
+const MENSAJE_ID_INVALIDO = "Revisá el identificador: son las 6 letras y números de la etiqueta del equipo (por ejemplo A1B2C3).";
+const MENSAJE_NO_ENCONTRADO = "No encontramos ese equipo. Fijate que esté enchufado y conectado al Wi-Fi, esperá un minuto y probá de nuevo.";
+const MENSAJE_CODIGO_INCORRECTO = "El código no coincide. Revisá los 6 números de la etiqueta del equipo.";
+const MENSAJE_YA_ES_TUYO = "Este equipo ya está en tu cuenta.";
+const MENSAJE_DE_OTRA_CUENTA = "Este equipo ya está en la cuenta de otra persona. Si te lo dieron usado, pedile que lo quite de su cuenta.";
+const MENSAJE_BLOQUEO = "Probaste muchas veces. Esperá 10 minutos y volvé a intentar.";
+
 /**
  * Valida un nombre (del equipo o de un artefacto): obligatorio y de hasta 40 caracteres.
  */
 function validar_nombre_service(string $nombre, string $que): string
 {
     $nombre = trim($nombre);
-    if ($nombre === "" || mb_strlen($nombre) > 40) {
-        throw new InvalidArgumentException("Poné un nombre para {$que} (hasta 40 caracteres).");
+    if ($nombre === "") {
+        throw new InvalidArgumentException("Elegí o escribí {$que}.");
+    }
+    if (mb_strlen($nombre) > 40) {
+        throw new InvalidArgumentException("El nombre de {$que} es muy largo: puede tener hasta 40 letras.");
     }
 
     return $nombre;
@@ -59,15 +73,24 @@ function nombres_tomas_service(string $dispositivoId, int $cantidad): array
 }
 
 /**
- * Convierte lo que escribe el usuario ("a1b2c3", "EcoSmart_A1B2C3") en el id del dispositivo.
+ * Convierte lo que escribe o escanea el usuario en el id del dispositivo. Acepta:
+ *   "a1b2c3", "EcoSmart_A1B2C3"                 -> EcoSmart_A1B2C3
+ *   la MAC completa "24:6F:28:A1:B2:C3"          -> EcoSmart_A1B2C3
+ *   (también con guiones o sin separadores)
+ * Igual que el firmware, el id son los últimos 6 caracteres de la MAC.
  */
 function normalizar_id_dispositivo_service(string $texto): string
 {
     $texto = strtoupper(trim($texto));
     $texto = preg_replace("/^ECOSMART_/", "", $texto);
 
+    $sinSeparadores = preg_replace("/[\s:.\-]/", "", $texto);
+    if (preg_match("/^[0-9A-F]{12}$/", $sinSeparadores)) {
+        $texto = substr($sinSeparadores, -6);
+    }
+
     if (!preg_match("/^[A-Z0-9]{3,20}$/", $texto)) {
-        throw new InvalidArgumentException("El identificador del equipo no es válido.");
+        throw new InvalidArgumentException(MENSAJE_ID_INVALIDO);
     }
 
     return PREFIJO_DISPOSITIVO . $texto;
@@ -132,19 +155,18 @@ function listar_mis_dispositivos_service(array $usuario): array
 }
 
 /**
- * Vincula un equipo a la cuenta. Pasos:
+ * Revisa, sin cambiar nada, si el usuario puede quedarse con el equipo. Controles en orden:
  *   1. el equipo existe (ya se conectó alguna vez a Firebase)
  *   2. no tiene dueño
- *   3. el código coincide con el que generó el equipo
+ *   3. el código coincide con el que generó el equipo (prueba que la persona lo tiene en la mano)
+ * Devuelve el id del equipo o lanza InvalidArgumentException con un mensaje para el usuario.
  * Después de 5 intentos fallidos, se bloquea 10 minutos para evitar que adivinen códigos.
  */
-function vincular_dispositivo_service(array $usuario, string $textoId, string $codigo, string $nombre, array $nombresTomas = []): string
+function revisar_vinculacion_service(array $usuario, string $textoId, string $codigo): string
 {
     verificar_intentos_vinculacion_service();
 
     $dispositivoId = normalizar_id_dispositivo_service($textoId);
-    $nombre = validar_nombre_service($nombre, "el equipo");
-    $tomas = validar_tomas_service($nombresTomas);
     $codigo = trim($codigo);
 
     $info = obtener_info_dispositivo_persistence($dispositivoId);
@@ -152,20 +174,30 @@ function vincular_dispositivo_service(array $usuario, string $textoId, string $c
 
     if ($info === null || $codigoGuardado === null) {
         sumar_intento_fallido_service();
-        throw new InvalidArgumentException("No encontramos ese equipo. Revisá que esté enchufado y conectado a internet.");
+        throw new InvalidArgumentException(MENSAJE_NO_ENCONTRADO);
     }
 
     if (!empty($info["duenio"])) {
-        $mensaje = $info["duenio"] === $usuario["uid"]
-            ? "Ese equipo ya está en tu cuenta."
-            : "Ese equipo ya está vinculado a otra cuenta.";
-        throw new InvalidArgumentException($mensaje);
+        throw new InvalidArgumentException($info["duenio"] === $usuario["uid"] ? MENSAJE_YA_ES_TUYO : MENSAJE_DE_OTRA_CUENTA);
     }
 
     if (!hash_equals($codigoGuardado, $codigo)) {
         sumar_intento_fallido_service();
-        throw new InvalidArgumentException("El código de vinculación es incorrecto.");
+        throw new InvalidArgumentException(MENSAJE_CODIGO_INCORRECTO);
     }
+
+    return $dispositivoId;
+}
+
+/**
+ * Vincula el equipo a la cuenta del usuario que inició sesión: ese usuario pasa a ser el dueño.
+ * Los nombres de las tomas son opcionales (sin nombre quedan "Toma 1", "Toma 2", "Toma 3").
+ */
+function vincular_dispositivo_service(array $usuario, string $textoId, string $codigo, string $nombre, array $nombresTomas = []): string
+{
+    $nombre = validar_nombre_service($nombre, "el lugar del equipo");
+    $tomas = validar_tomas_service($nombresTomas);
+    $dispositivoId = revisar_vinculacion_service($usuario, $textoId, $codigo);
 
     asignar_duenio_persistence($dispositivoId, $usuario["uid"], $nombre);
     guardar_tomas_persistence($dispositivoId, $tomas);
@@ -189,7 +221,7 @@ function renombrar_dispositivo_service(array $usuario, string $dispositivoId, st
 {
     verificar_acceso_dispositivo_service($usuario, $dispositivoId);
 
-    $nombre = validar_nombre_service($nombre, "el equipo");
+    $nombre = validar_nombre_service($nombre, "el lugar del equipo");
     $tomas = validar_tomas_service($nombresTomas);
 
     renombrar_dispositivo_persistence($dispositivoId, $nombre);
@@ -245,7 +277,7 @@ function verificar_intentos_vinculacion_service(): void
     }
 
     if ($datos["intentos"] >= MAX_INTENTOS_VINCULACION) {
-        throw new InvalidArgumentException("Demasiados intentos fallidos. Esperá 10 minutos y probá de nuevo.");
+        throw new InvalidArgumentException(MENSAJE_BLOQUEO);
     }
 }
 

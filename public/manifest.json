@@ -5,8 +5,8 @@
   "start_url": "./panel",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#F4F7FB",
-  "theme_color": "#0A2E6B",
+  "background_color": "#1E2020",
+  "theme_color": "#1E2020",
   "lang": "es-AR",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },

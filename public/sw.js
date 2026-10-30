@@ -3,7 +3,7 @@
 // Las respuestas de la API NUNCA se guardan: siempre tienen que ser datos actuales.
 // Cambiar VERSION cada vez que se modifiquen los archivos estáticos.
 
-const VERSION = "energhost-v3";
+const VERSION = "energhost-v6";
 const ARCHIVOS = [
   "./css/app.css",
   "./css/landing.css",

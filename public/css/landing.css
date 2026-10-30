@@ -1,4 +1,4 @@
-/* Presentación de Voltec Ergon (diseño original del equipo) */
+/* Presentación de Voltec Ergon. Base del diseño del equipo + estilo final oscuro con acento azul (al final del archivo). */
 
 :root{
   --navy-deep:#0A2E6B;
@@ -72,21 +72,17 @@ header{
 }
 .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1180px;margin:0 auto;}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:17px;color:var(--navy-deep);}
-.brand .mark{
-  width:32px;height:32px;border-radius:7px;
-  background:linear-gradient(135deg,var(--navy-deep),var(--blue-brand));
-  position:relative;flex-shrink:0;
-}
-.brand .mark::after{
-  content:"";position:absolute;inset:9px;
-  border:2px solid var(--amber-alert);border-right-color:transparent;border-bottom-color:transparent;
-  border-radius:2px;transform:rotate(45deg);
-}
 .brand small{display:block;font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.08em;color:var(--ink-soft);text-transform:uppercase;margin-top:1px;}
 .nav-links{display:flex;gap:32px;font-size:14.5px;font-weight:500;color:var(--ink-soft);}
 .nav-links a:hover{color:var(--blue-brand);}
 .nav-cta{display:flex;gap:10px;align-items:center;}
 @media(max-width:880px){.nav-links{display:none;}}
+
+/* ---------- Logo (onda) ---------- */
+.brand .mark{width:34px;height:34px;flex-shrink:0;display:block;}
+.brand .mark .logo-fondo{fill:var(--logo-fondo,#0A2E6B);}
+.brand .mark .logo-onda{fill:none;stroke:var(--logo-onda,#fff);stroke-width:5;stroke-linecap:round;}
+.brand .mark .logo-ahorro{fill:none;stroke:var(--green-energy);stroke-width:5;stroke-linecap:round;}
 
 /* ---------- HERO ---------- */
 .hero{padding:76px 0 60px;position:relative;overflow:hidden;}
@@ -294,3 +290,147 @@ footer{padding:56px 0 30px;}
 .fuente{font-size:12.5px;color:#9FB6E0;margin-top:14px;}
 .fuente a{text-decoration:underline;}
 .calc .nota{font-size:12px;color:#9FB6E0;margin-top:14px;}
+
+/* =====================================================================
+   Estilo final: oscuro con acento azul (presentación).
+   Fondo carbón, bordes de 1 px en lugar de sombras, radios de 20 px y un solo
+   botón con brillo por pantalla.
+   Colores: azul = marca y acciones · verde = energía (toma encendida, en línea, ahorro)
+            rojo = cortes y alertas
+   ===================================================================== */
+
+:root{
+  --navy-deep:#F4F5F5;          /* los títulos pasan a blanco */
+  --blue-brand:#8FB4FF;         /* links y detalles: azul Voltec aclarado para fondo oscuro */
+  --blue-bright:#8FB4FF;
+  --green-energy:#0FB88A;
+  --amber-alert:#FFC72C;
+  --bg-light:#1E2020;           /* lienzo carbón */
+  --bg-white:#1E2020;           /* las tarjetas son del mismo carbón, separadas por borde */
+  --ink:#F4F5F5;
+  --ink-soft:#A3A8A8;
+  --line:#383C3C;
+  --glow-verde:0 0 30px 0 rgba(15,184,138,.55);
+  --glow-blanco:0 0 30px 0 rgba(255,255,255,.18);
+  --radio:20px;
+  --logo-fondo:#0057D6;
+}
+
+body{background:var(--bg-light);color:var(--ink);}
+h1,h2,h3{font-weight:300;letter-spacing:-0.025em;color:var(--navy-deep);}
+.eyebrow{color:var(--ink-soft);}
+
+/* Botones: uno solo con brillo verde; el resto, contorno blanco */
+.btn{border-radius:var(--radio);font-weight:500;}
+.btn-primary{background:var(--green-energy);color:#06231A;box-shadow:var(--glow-verde);}
+.btn-primary:hover{background:#13CC99;transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid rgba(255,255,255,.55);}
+.btn-ghost:hover{border-color:#fff;color:#fff;box-shadow:var(--glow-blanco);}
+
+/* Encabezado transparente */
+header{background:rgba(30,32,32,.82);border-bottom:1px solid transparent;}
+.brand{color:var(--ink);}
+.nav-links a{color:var(--ink-soft);}
+.nav-links a:hover{color:#fff;}
+.nav-cta .btn-ghost{border-color:#8FB4FF;color:#8FB4FF;}
+.nav-cta .btn-ghost:hover{box-shadow:none;background:rgba(143,180,255,.08);}
+
+/* Hero: títulos grandes y finos */
+.hero{padding:96px 0 72px;}
+.hero::before{background:radial-gradient(circle,rgba(15,184,138,.10),transparent 70%);}
+.hero h1{font-size:54px;line-height:1.04;font-weight:300;}
+.hero h1 em{color:var(--green-energy);}
+.hero-stats{border-top:1px solid var(--line);}
+.hero-stats .num{color:#fff;font-weight:500;}
+
+.dash-card{background:#232626;border:1px solid var(--line);border-radius:var(--radio);box-shadow:none;}
+.metric,.dash-chart{background:transparent;border:1px solid var(--line);border-radius:14px;}
+.metric .l,.dash-chart .l,.dash-top .name{color:var(--ink-soft);}
+.metric .v span{color:var(--ink-soft);}
+
+/* Secciones: sin bandas de color, separadas por espacio */
+section{padding:120px 0;}
+.section-head h2{font-size:46px;line-height:1.08;}
+.bg-white,.bg-navy{background:transparent;color:var(--ink);}
+.bg-navy .eyebrow{color:var(--ink-soft);}
+.bg-navy .eyebrow::before{background:var(--green-energy);box-shadow:0 0 0 3px rgba(15,184,138,.18);}
+.bg-navy p{color:var(--ink-soft);}
+
+.factura,.spec,.team-card,.step-card,.calc{background:transparent;border:1px solid var(--line);border-radius:var(--radio);}
+.factura .tag{background:rgba(255,90,78,.14);color:#FF8A80;}
+.problem-item .ico,.team-card .tag{background:rgba(143,180,255,.10);color:#8FB4FF;}
+.problem-item h4,.flow-step h4,.t-item h4{color:#fff;font-weight:500;}
+.flow-step .n{background:var(--bg-light);border-color:var(--line);color:var(--ink-soft);}
+
+.device-visual{background:radial-gradient(circle at 50% 45%,#2B302F,#1A1C1C 70%);border:1px solid var(--line);border-radius:var(--radio);}
+.device-visual .ring{border-color:rgba(15,184,138,.22);}
+.device-visual .core{background:#1E2020;border:1px solid var(--green-energy);box-shadow:var(--glow-verde);}
+.device-visual .core span{color:var(--green-energy);}
+.device-visual .float-tag{background:#2A2D2D;color:var(--ink);border:1px solid var(--line);box-shadow:none;}
+
+.calc label,.calc .val-row,.calc-result .box .l,.impact-copy .stat-row .lbl,.fuente,.calc .nota{color:var(--ink-soft);}
+.calc-result .box{background:transparent;border:1px solid var(--line);border-radius:14px;}
+
+.t-item::before{background:var(--bg-light);border-color:var(--green-energy);}
+.timeline{border-left-color:var(--line);}
+
+/* Llamado final: sin degradé, borde y un único botón con brillo */
+.cta-band{background:transparent;border:1px solid var(--line);border-radius:var(--radio);}
+.cta-band h2{font-size:36px;}
+.cta-band p{color:var(--ink-soft);}
+.cta-band .btn-primary{background:var(--green-energy);color:#06231A;}
+.cta-band .btn-primary:hover{background:#13CC99;color:#06231A;}
+
+footer{padding-top:128px;}
+.footer-grid{border-bottom-color:var(--line);}
+.footer-grid a:hover{color:#fff;}
+
+@media(max-width:600px){
+  .hero h1{font-size:40px;}
+  .section-head h2{font-size:32px;}
+  section{padding:72px 0;}
+}
+
+/* Un solo brillo por pantalla: el botón del menú va relleno pero sin brillo */
+.nav-cta .btn-primary{box-shadow:none;}
+
+/* ---------- Acento azul ---------- */
+:root {
+  --acento: #0057D6;
+  --acento-claro: #4D94FF;
+  --glow-azul: 0 0 30px 0 rgba(43,127,255,.55);
+  --blue-brand: #8FB4FF;
+}
+
+/* Botón principal: azul Voltec con brillo (uno por pantalla) */
+.btn-primary { background: var(--acento); color: #fff; box-shadow: var(--glow-azul); }
+.btn-primary:hover { background: #2B7FFF; color: #fff; }
+.nav-cta .btn-primary { box-shadow: none; }
+.cta-band .btn-primary { background: var(--acento); color: #fff; }
+.cta-band .btn-primary:hover { background: #2B7FFF; color: #fff; }
+
+/* Presentación */
+.hero::before { background: radial-gradient(circle, rgba(43,127,255,.14), transparent 70%); }
+.hero h1 em { color: var(--acento-claro); }
+.eyebrow::before { background: var(--acento-claro); box-shadow: 0 0 0 3px rgba(77,148,255,.2); }
+.device-visual .ring { border-color: rgba(77,148,255,.25); }
+.device-visual .core { border-color: var(--acento-claro); box-shadow: var(--glow-azul); }
+.device-visual .core span { color: var(--acento-claro); }
+.t-item::before { border-color: var(--acento-claro); }
+.dash-chart polyline, .dash-chart path { stroke: var(--acento-claro); }
+
+/* Panel */
+.formulario input:focus { outline: 2px solid rgba(77,148,255,.35); border-color: var(--acento-claro); }
+.grafico .linea { stroke: var(--acento-claro); }
+.equipo:hover { border-color: rgba(77,148,255,.6); }
+
+/* ---------- Lectura cómoda para todas las edades ---------- */
+:root{--ink-soft:#B9BEBE;}
+body{font-size:17px;}
+h1,h2{font-weight:400;}
+.hero p.lead{font-size:19px;}
+.section-head p{font-size:17.5px;}
+.btn{min-height:50px;font-size:16px;justify-content:center;}
+.nav-links{font-size:15.5px;}
+.problem-item p,.step-card p,.t-item p,.flow-step p{font-size:15.5px;}
+.footer-grid a,.footer-grid li{font-size:15px;}

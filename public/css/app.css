@@ -30,8 +30,11 @@ h1 { font-size: 28px; }
 .barra { position: sticky; top: 0; z-index: 10; background: rgba(244,247,251,.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
 .barra-interior { max-width: 1180px; margin: 0 auto; padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
 .brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 17px; color: var(--navy-deep); text-decoration: none; }
-.brand .mark { width: 32px; height: 32px; border-radius: 7px; background: linear-gradient(135deg, var(--navy-deep), var(--blue-brand)); position: relative; flex-shrink: 0; }
-.brand .mark::after { content: ""; position: absolute; inset: 9px; border: 2px solid var(--amber-alert); border-right-color: transparent; border-bottom-color: transparent; border-radius: 2px; transform: rotate(45deg); }
+/* ---------- Logo (onda) ---------- */
+.brand .mark{width:34px;height:34px;flex-shrink:0;display:block;}
+.brand .mark .logo-fondo{fill:var(--logo-fondo,#0A2E6B);}
+.brand .mark .logo-onda{fill:none;stroke:var(--logo-onda,#fff);stroke-width:5;stroke-linecap:round;}
+.brand .mark .logo-ahorro{fill:none;stroke:var(--green-energy);stroke-width:5;stroke-linecap:round;}
 .brand small { display: block; font-family: var(--mono); font-weight: 400; font-size: 10px; letter-spacing: .08em; color: var(--ink-soft); text-transform: uppercase; }
 .menu { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; font-size: 14.5px; font-weight: 500; }
 .menu a { color: var(--ink-soft); text-decoration: none; }
@@ -143,3 +146,198 @@ tr:last-child td { border-bottom: 0; }
 
 /* ---------- Pie ---------- */
 .pie { padding: 22px 20px; text-align: center; font-size: 12.5px; color: var(--ink-soft); border-top: 1px solid var(--line); }
+
+/* =====================================================================
+   Estilo final: oscuro con acento azul (panel).
+   Fondo carbón, bordes de 1 px en lugar de sombras, radios de 20 px y un solo
+   botón con brillo por pantalla.
+   Colores: azul = marca y acciones · verde = energía (toma encendida, en línea, ahorro)
+            rojo = cortes y alertas
+   ===================================================================== */
+
+:root {
+  --navy-deep: #F4F5F5;
+  --blue-brand: #8FB4FF;
+  --green-energy: #0FB88A;
+  --amber-alert: #FFC72C;
+  --red: #FF5A4E;
+  --bg-light: #1E2020;
+  --bg-white: #1E2020;
+  --ink: #F4F5F5;
+  --ink-soft: #A3A8A8;
+  --line: #383C3C;
+  --glow-verde: 0 0 30px 0 rgba(15,184,138,.55);
+  --radio: 20px;
+  --logo-fondo: #0057D6;
+}
+
+body { background: var(--bg-light); color: var(--ink); }
+a { color: var(--blue-brand); }
+h1 { font-size: 40px; font-weight: 300; letter-spacing: -0.025em; }
+.texto-suave { color: var(--ink-soft); }
+
+/* Encabezado */
+.barra { background: rgba(30,32,32,.85); border-bottom-color: var(--line); }
+.brand { color: var(--ink); }
+.menu a { color: var(--ink-soft); }
+.menu a:hover { color: #fff; }
+
+/* Botones */
+.btn { border-radius: var(--radio); font-weight: 500; }
+.btn-primary { background: var(--green-energy); color: #06231A; box-shadow: var(--glow-verde); }
+.btn-primary:hover { background: #13CC99; }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid rgba(255,255,255,.5); }
+.btn-ghost:hover { border-color: #fff; color: #fff; }
+.btn-peligro { background: transparent; color: var(--red); border: 1px solid rgba(255,90,78,.55); }
+.btn-peligro:hover { background: rgba(255,90,78,.10); }
+.btn-link:hover { color: #fff; }
+
+/* Tarjetas: mismo carbón que el fondo, separadas por un borde fino */
+.tarjeta { background: transparent; border: 1px solid var(--line); border-radius: var(--radio); padding: 24px; }
+.tarjeta h2 { color: var(--ink-soft); }
+.valor { color: #fff; font-weight: 500; }
+.desactualizado .valor { color: #5E6464; }
+.tarjeta-alerta { border-color: var(--red); box-shadow: none; }
+
+/* Estado de conexión */
+.estado { background: transparent; border-color: var(--line); color: var(--ink-soft); }
+.estado-verde { color: var(--green-energy); border-color: rgba(15,184,138,.5); background: rgba(15,184,138,.08); }
+.estado-rojo { color: var(--red); border-color: rgba(255,90,78,.5); background: rgba(255,90,78,.08); }
+
+/* Avisos */
+.aviso { border-radius: 14px; }
+.aviso-ok { background: rgba(15,184,138,.08); border-color: rgba(15,184,138,.45); color: #7FE3C3; }
+.aviso-error, .aviso-rojo { background: rgba(255,90,78,.08); border-color: rgba(255,90,78,.5); color: #FFB1AA; }
+.aviso-amarillo { background: rgba(255,199,44,.08); border-color: rgba(255,199,44,.45); color: #FFE08A; }
+.aviso-gris { background: transparent; border-color: var(--line); color: var(--ink-soft); }
+
+/* Formularios */
+.formulario label { color: var(--ink); font-weight: 500; }
+.formulario input, .form-linea input { background: #252828; border: 1px solid var(--line); color: var(--ink); border-radius: 14px; }
+.formulario input::placeholder { color: #6E7474; }
+.formulario input:focus { outline: 2px solid rgba(15,184,138,.30); border-color: var(--green-energy); }
+.tomas-form { border-color: var(--line); border-radius: var(--radio); }
+.tomas-form legend { color: var(--ink); }
+
+/* Lista de equipos */
+.equipo:hover { border-color: rgba(255,255,255,.45); transform: none; }
+.equipo-nombre { color: #fff; font-weight: 500; }
+
+/* Tomas: la que está encendida se marca con un borde verde */
+.rele { border-color: var(--line); border-radius: 16px; }
+.rele:has(.interruptor:checked) { border-color: rgba(15,184,138,.55); }
+.rele-nombre { color: #fff; font-weight: 500; }
+.rele-estado.encendido { color: var(--green-energy); }
+.interruptor { background: #3A3F3F; }
+.interruptor::after { box-shadow: none; }
+
+/* Gráfico */
+.grafico .guia { stroke: #2E3232; }
+.grafico .eje { fill: var(--ink-soft); }
+
+/* Tablas */
+th { border-bottom-color: var(--line); }
+td { border-bottom-color: #2E3232; }
+.etiqueta { background: rgba(143,180,255,.12); color: var(--blue-brand); }
+.etiqueta-admin { background: rgba(255,199,44,.14); color: #FFE08A; }
+
+.pie { border-top-color: var(--line); }
+.eyebrow { color: var(--ink-soft); }
+
+/* ---------- Acento azul ---------- */
+:root {
+  --acento: #0057D6;
+  --acento-claro: #4D94FF;
+  --glow-azul: 0 0 30px 0 rgba(43,127,255,.55);
+  --blue-brand: #8FB4FF;
+}
+
+/* Botón principal: azul Voltec con brillo (uno por pantalla) */
+.btn-primary { background: var(--acento); color: #fff; box-shadow: var(--glow-azul); }
+.btn-primary:hover { background: #2B7FFF; color: #fff; }
+.nav-cta .btn-primary { box-shadow: none; }
+.cta-band .btn-primary { background: var(--acento); color: #fff; }
+.cta-band .btn-primary:hover { background: #2B7FFF; color: #fff; }
+
+/* Presentación */
+.hero::before { background: radial-gradient(circle, rgba(43,127,255,.14), transparent 70%); }
+.hero h1 em { color: var(--acento-claro); }
+.eyebrow::before { background: var(--acento-claro); box-shadow: 0 0 0 3px rgba(77,148,255,.2); }
+.device-visual .ring { border-color: rgba(77,148,255,.25); }
+.device-visual .core { border-color: var(--acento-claro); box-shadow: var(--glow-azul); }
+.device-visual .core span { color: var(--acento-claro); }
+.t-item::before { border-color: var(--acento-claro); }
+.dash-chart polyline, .dash-chart path { stroke: var(--acento-claro); }
+
+/* Panel */
+.formulario input:focus { outline: 2px solid rgba(77,148,255,.35); border-color: var(--acento-claro); }
+.grafico .linea { stroke: var(--acento-claro); }
+.equipo:hover { border-color: rgba(77,148,255,.6); }
+
+/* =====================================================================
+   Vinculación en 3 toques (QR → "Encontramos tu equipo" → lugar → Vincular)
+   ===================================================================== */
+.caja-form { max-width: 560px; }
+.centrado { text-align: center; }
+.equipo-encontrado { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; flex-wrap: wrap; }
+.equipo-dibujo { width: 120px; height: auto; flex-shrink: 0; }
+.dibujo-cuerpo { fill: none; stroke: var(--line); stroke-width: 2; }
+.dibujo-toma { fill: none; stroke: var(--ink-soft); stroke-width: 2; }
+.dibujo-luz { fill: var(--green-energy); }
+
+.lugares { border: 0; padding: 0; margin: 0; min-width: 0; }
+.lugares legend { font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 12px; padding: 0; }
+.lugares-opciones { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media (min-width: 560px) { .lugares-opciones { grid-template-columns: repeat(3, 1fr); } }
+.lugares-opciones input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.formulario .lugar { display: flex; align-items: center; justify-content: center; min-height: 56px; margin: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 16px; font-size: 17px; font-weight: 500; color: var(--ink); text-align: center; cursor: pointer; transition: .15s ease; }
+.formulario .lugar:hover { border-color: rgba(255,255,255,.45); }
+.lugares-opciones input:checked + .lugar { border-color: var(--acento-claro, #4D94FF); background: rgba(77,148,255,.14); color: #fff; box-shadow: inset 0 0 0 1px var(--acento-claro, #4D94FF); }
+.lugares-opciones input:focus-visible + .lugar { outline: 3px solid rgba(77,148,255,.55); outline-offset: 2px; }
+.lugar-otro-campo { display: none; margin-top: 12px; gap: 6px; }
+.lugares:has(#lugar-otro:checked) .lugar-otro-campo { display: grid; }
+
+.paso { display: grid; grid-template-columns: 40px 1fr; gap: 14px; margin-top: 20px; align-items: start; }
+.paso-numero { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--acento-claro, #4D94FF); color: var(--acento-claro, #4D94FF); font-family: var(--mono); font-weight: 600; display: flex; align-items: center; justify-content: center; margin-top: 6px; }
+.paso-campos { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.paso-campos label { margin-top: 0; }
+.consejo-qr { margin: 14px 0 6px; }
+.tomas-opcionales { margin-top: 22px; }
+.tomas-opcionales summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-size: 16px; color: var(--blue-brand); }
+.tomas-opcionales .tomas-form { margin-top: 8px; }
+.btn-grande { min-height: 56px; font-size: 18px; width: 100%; margin-top: 24px; }
+.pasos-inicio { text-align: left; max-width: 460px; margin: 14px auto 22px; padding-left: 22px; font-size: 16.5px; color: var(--ink); }
+.pasos-inicio li { margin-bottom: 10px; }
+
+/* =====================================================================
+   Lectura cómoda para todas las edades
+   Texto más grande, grises más claros, títulos menos finos y zonas táctiles de 48 px o más.
+   ===================================================================== */
+:root { --ink-soft: #B9BEBE; }
+body { font-size: 17px; line-height: 1.6; }
+h1 { font-weight: 400; }
+.texto-suave { font-size: 15.5px; }
+.tarjeta h2 { font-size: 13.5px; color: #C3C8C8; }
+.unidad { font-size: 14px; }
+.menu { font-size: 16px; gap: 20px; }
+.menu a { display: inline-block; padding: 10px 2px; }
+.btn { min-height: 48px; font-size: 16px; padding: 12px 22px; justify-content: center; }
+.btn-chico { min-height: 40px; font-size: 14.5px; padding: 8px 14px; }
+.formulario label { font-size: 15.5px; }
+.formulario input { min-height: 52px; font-size: 17px; }
+.formulario .ayuda { font-size: 14px; color: var(--ink-soft); }
+.aviso { font-size: 16px; }
+table { font-size: 15px; }
+.rele { min-height: 64px; }
+.rele-nombre { font-size: 17px; }
+.interruptor { width: 56px; height: 32px; }
+.interruptor::after { width: 26px; height: 26px; }
+.interruptor:checked::after { transform: translateX(24px); }
+h1 { line-height: 1.15; }
+@media (max-width: 520px) {
+  h1 { font-size: 32px; }
+  .menu { gap: 14px; font-size: 15px; }
+}
+/* Lugar elegido: fondo azul y un tilde, así se nota sin dudas cuál está marcado */
+.lugares-opciones input:checked + .lugar { background: rgba(77,148,255,.24); font-weight: 600; }
+.lugares-opciones input:checked + .lugar::before { content: "✓"; margin-right: 8px; color: #fff; }

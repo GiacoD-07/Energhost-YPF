@@ -1,0 +1,5 @@
+# Para Apache (XAMPP o hosting): todo lo que no sea un archivo real va a index.php
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]

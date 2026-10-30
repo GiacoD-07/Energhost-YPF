@@ -10,7 +10,7 @@ $licuadoraKwhHora = 0.3; // una hora de licuadora
 <header>
   <div class="nav">
     <a class="brand" href="<?= $base ?>/">
-      <div class="mark"></div>
+      <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><circle class="logo-fondo" cx="32" cy="32" r="30"/><path class="logo-onda" d="M10 32 C16 12, 26 12, 32 32"/><path class="logo-ahorro" d="M32 32 C38 52, 48 52, 54 32"/></svg>
       <div>VOLTEC ERGON<small>Consultora de energía IoT</small></div>
     </a>
     <nav class="nav-links">
@@ -319,7 +319,7 @@ $licuadoraKwhHora = 0.3; // una hora de licuadora
     <div class="footer-grid">
       <div>
         <div class="brand" style="margin-bottom:14px;">
-          <div class="mark"></div>
+          <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><circle class="logo-fondo" cx="32" cy="32" r="30"/><path class="logo-onda" d="M10 32 C16 12, 26 12, 32 32"/><path class="logo-ahorro" d="M32 32 C38 52, 48 52, 54 32"/></svg>
           <div>VOLTEC ERGON<small>Consultora de energía IoT</small></div>
         </div>
         <p style="font-size:13.5px;color:var(--ink-soft);max-width:280px;">Monitoreo, análisis y optimización del consumo energético residencial e institucional.</p>
@@ -339,7 +339,7 @@ $licuadoraKwhHora = 0.3; // una hora de licuadora
       <div>
         <h5>App</h5>
         <a href="<?= $base ?>/panel">Energhost — Mi panel</a>
-        <a href="<?= $base ?>/vincular">Vincular un equipo</a>
+        <a href="<?= $base ?>/vincular">Agregar un equipo</a>
         <a href="<?= $base ?>/registro">Crear cuenta</a>
       </div>
     </div>
